@@ -38,6 +38,7 @@ extern int ESTIMATE_TD;
 extern int ROLLING_SHUTTER;
 extern double ROW, COL;
 
+extern std::string INIT_ALGO;
 
 void readParameters(ros::NodeHandle &n);
 

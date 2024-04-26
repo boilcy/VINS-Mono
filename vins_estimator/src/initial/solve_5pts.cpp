@@ -1,8 +1,8 @@
 #include "solve_5pts.h"
 
-
-namespace cv {
-    void decomposeEssentialMat( InputArray _E, OutputArray _R1, OutputArray _R2, OutputArray _t )
+namespace cv
+{
+    void decomposeEssentialMat(InputArray _E, OutputArray _R1, OutputArray _R2, OutputArray _t)
     {
 
         Mat E = _E.getMat().reshape(1, 3);
@@ -11,8 +11,10 @@ namespace cv {
         Mat D, U, Vt;
         SVD::compute(E, D, U, Vt);
 
-        if (determinant(U) < 0) U *= -1.;
-        if (determinant(Vt) < 0) Vt *= -1.;
+        if (determinant(U) < 0)
+            U *= -1.;
+        if (determinant(Vt) < 0)
+            Vt *= -1.;
 
         Mat W = (Mat_<double>(3, 3) << 0, 1, 0, -1, 0, 0, 0, 0, 1);
         W.convertTo(W, E.type());
@@ -27,8 +29,8 @@ namespace cv {
         t.copyTo(_t);
     }
 
-    int recoverPose( InputArray E, InputArray _points1, InputArray _points2, InputArray _cameraMatrix,
-                         OutputArray _R, OutputArray _t, InputOutputArray _mask)
+    int recoverPose(InputArray E, InputArray _points1, InputArray _points2, InputArray _cameraMatrix,
+                    OutputArray _R, OutputArray _t, InputOutputArray _mask)
     {
 
         Mat points1, points2, cameraMatrix;
@@ -37,8 +39,8 @@ namespace cv {
         _cameraMatrix.getMat().convertTo(cameraMatrix, CV_64F);
 
         int npoints = points1.checkVector(2);
-        CV_Assert( npoints >= 0 && points2.checkVector(2) == npoints &&
-                                  points1.type() == points2.type());
+        CV_Assert(npoints >= 0 && points2.checkVector(2) == npoints &&
+                  points1.type() == points2.type());
 
         CV_Assert(cameraMatrix.rows == 3 && cameraMatrix.cols == 3 && cameraMatrix.channels() == 1);
 
@@ -48,10 +50,10 @@ namespace cv {
             points2 = points2.reshape(1, npoints);
         }
 
-        double fx = cameraMatrix.at<double>(0,0);
-        double fy = cameraMatrix.at<double>(1,1);
-        double cx = cameraMatrix.at<double>(0,2);
-        double cy = cameraMatrix.at<double>(1,2);
+        double fx = cameraMatrix.at<double>(0, 0);
+        double fy = cameraMatrix.at<double>(1, 1);
+        double cx = cameraMatrix.at<double>(0, 2);
+        double cy = cameraMatrix.at<double>(1, 2);
 
         points1.col(0) = (points1.col(0) - cx) / fx;
         points2.col(0) = (points2.col(0) - cx) / fx;
@@ -65,10 +67,14 @@ namespace cv {
         decomposeEssentialMat(E, R1, R2, t);
         Mat P0 = Mat::eye(3, 4, R1.type());
         Mat P1(3, 4, R1.type()), P2(3, 4, R1.type()), P3(3, 4, R1.type()), P4(3, 4, R1.type());
-        P1(Range::all(), Range(0, 3)) = R1 * 1.0; P1.col(3) = t * 1.0;
-        P2(Range::all(), Range(0, 3)) = R2 * 1.0; P2.col(3) = t * 1.0;
-        P3(Range::all(), Range(0, 3)) = R1 * 1.0; P3.col(3) = -t * 1.0;
-        P4(Range::all(), Range(0, 3)) = R2 * 1.0; P4.col(3) = -t * 1.0;
+        P1(Range::all(), Range(0, 3)) = R1 * 1.0;
+        P1.col(3) = t * 1.0;
+        P2(Range::all(), Range(0, 3)) = R2 * 1.0;
+        P2.col(3) = t * 1.0;
+        P3(Range::all(), Range(0, 3)) = R1 * 1.0;
+        P3.col(3) = -t * 1.0;
+        P4(Range::all(), Range(0, 3)) = R2 * 1.0;
+        P4.col(3) = -t * 1.0;
 
         // Do the cheirality check.
         // Notice here a threshold dist is used to filter
@@ -153,14 +159,16 @@ namespace cv {
         {
             R1.copyTo(_R);
             t.copyTo(_t);
-            if (_mask.needed()) mask1.copyTo(_mask);
+            if (_mask.needed())
+                mask1.copyTo(_mask);
             return good1;
         }
         else if (good2 >= good1 && good2 >= good3 && good2 >= good4)
         {
             R2.copyTo(_R);
             t.copyTo(_t);
-            if (_mask.needed()) mask2.copyTo(_mask);
+            if (_mask.needed())
+                mask2.copyTo(_mask);
             return good2;
         }
         else if (good3 >= good1 && good3 >= good2 && good3 >= good4)
@@ -168,7 +176,8 @@ namespace cv {
             t = -t;
             R1.copyTo(_R);
             t.copyTo(_t);
-            if (_mask.needed()) mask3.copyTo(_mask);
+            if (_mask.needed())
+                mask3.copyTo(_mask);
             return good3;
         }
         else
@@ -176,19 +185,19 @@ namespace cv {
             t = -t;
             R2.copyTo(_R);
             t.copyTo(_t);
-            if (_mask.needed()) mask4.copyTo(_mask);
+            if (_mask.needed())
+                mask4.copyTo(_mask);
             return good4;
         }
     }
 
-    int recoverPose( InputArray E, InputArray _points1, InputArray _points2, OutputArray _R,
-                         OutputArray _t, double focal, Point2d pp, InputOutputArray _mask)
+    int recoverPose(InputArray E, InputArray _points1, InputArray _points2, OutputArray _R,
+                    OutputArray _t, double focal, Point2d pp, InputOutputArray _mask)
     {
-        Mat cameraMatrix = (Mat_<double>(3,3) << focal, 0, pp.x, 0, focal, pp.y, 0, 0, 1);
+        Mat cameraMatrix = (Mat_<double>(3, 3) << focal, 0, pp.x, 0, focal, pp.y, 0, 0, 1);
         return cv::recoverPose(E, _points1, _points2, cameraMatrix, _R, _t, _mask);
     }
 }
-
 
 bool MotionEstimator::solveRelativeRT(const vector<pair<Vector3d, Vector3d>> &corres, Matrix3d &Rotation, Vector3d &Translation)
 {
@@ -205,12 +214,12 @@ bool MotionEstimator::solveRelativeRT(const vector<pair<Vector3d, Vector3d>> &co
         cv::Mat cameraMatrix = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
         cv::Mat rot, trans;
         int inlier_cnt = cv::recoverPose(E, ll, rr, cameraMatrix, rot, trans, mask);
-        //cout << "inlier_cnt " << inlier_cnt << endl;
+        // cout << "inlier_cnt " << inlier_cnt << endl;
 
         Eigen::Matrix3d R;
         Eigen::Vector3d T;
         for (int i = 0; i < 3; i++)
-        {   
+        {
             T(i) = trans.at<double>(i, 0);
             for (int j = 0; j < 3; j++)
                 R(i, j) = rot.at<double>(i, j);
@@ -218,7 +227,7 @@ bool MotionEstimator::solveRelativeRT(const vector<pair<Vector3d, Vector3d>> &co
 
         Rotation = R.transpose();
         Translation = -R.transpose() * T;
-        if(inlier_cnt > 12)
+        if (inlier_cnt > 12)
             return true;
         else
             return false;
@@ -226,5 +235,32 @@ bool MotionEstimator::solveRelativeRT(const vector<pair<Vector3d, Vector3d>> &co
     return false;
 }
 
-
-
+bool MotionEstimator::relativePose(const FeatureManager &f_manager, Eigen::Matrix3d &relative_R, Eigen::Vector3d &relative_T, int &l)
+{
+    // find previous frame which contians enough correspondance and parallex with newest frame
+    for (int i = 0; i < WINDOW_SIZE; i++)
+    {
+        vector<pair<Vector3d, Vector3d>> corres;
+        corres = f_manager.getCorresponding(i, WINDOW_SIZE);
+        if (corres.size() > 20)
+        {
+            double sum_parallax = 0;
+            double average_parallax;
+            for (int j = 0; j < int(corres.size()); j++)
+            {
+                Vector2d pts_0(corres[j].first(0), corres[j].first(1));
+                Vector2d pts_1(corres[j].second(0), corres[j].second(1));
+                double parallax = (pts_0 - pts_1).norm();
+                sum_parallax = sum_parallax + parallax;
+            }
+            average_parallax = 1.0 * sum_parallax / int(corres.size());
+            if (average_parallax * 460 > 30 && MotionEstimator::solveRelativeRT(corres, relative_R, relative_T))
+            {
+                l = i;
+                ROS_DEBUG("average_parallax %f choose l %d and newest frame to triangulate the whole structure", average_parallax * 460, l);
+                return true;
+            }
+        }
+    }
+    return false;
+}

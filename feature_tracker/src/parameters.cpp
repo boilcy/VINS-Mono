@@ -1,5 +1,8 @@
 #include "parameters.h"
 
+std::string LETNET_PARAM;
+std::string LETNET_MODEL;
+std::string TRACKER_ALGO;
 std::string IMAGE_TOPIC;
 std::string IMU_TOPIC;
 std::vector<std::string> CAM_NAMES;
@@ -45,8 +48,12 @@ void readParameters(ros::NodeHandle &n)
     }
     std::string VINS_FOLDER_PATH = readParam<std::string>(n, "vins_folder");
 
+    LETNET_PARAM = VINS_FOLDER_PATH + "support_files/model/model.param";
+    LETNET_MODEL = VINS_FOLDER_PATH + "support_files/model/model.bin";
+
     fsSettings["image_topic"] >> IMAGE_TOPIC;
     fsSettings["imu_topic"] >> IMU_TOPIC;
+    fsSettings["tracker_algo"] >> TRACKER_ALGO;
     MAX_CNT = fsSettings["max_cnt"];
     MIN_DIST = fsSettings["min_dist"];
     ROW = fsSettings["image_height"];
@@ -69,6 +76,4 @@ void readParameters(ros::NodeHandle &n)
         FREQ = 100;
 
     fsSettings.release();
-
-
 }

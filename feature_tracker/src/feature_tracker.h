@@ -13,6 +13,7 @@
 #include "camodocal/camera_models/CataCamera.h"
 #include "camodocal/camera_models/PinholeCamera.h"
 
+#include "feature_tracker_algo.h"
 #include "parameters.h"
 #include "tic_toc.h"
 
@@ -27,39 +28,43 @@ void reduceVector(vector<int> &v, vector<uchar> status);
 
 class FeatureTracker
 {
-  public:
-    FeatureTracker();
+public:
+  FeatureTracker();
 
-    void readImage(const cv::Mat &_img,double _cur_time);
+  void setTrackerAlgo(const std::string &algorithm_type);
 
-    void setMask();
+  void readImage(const cv::Mat &_img, double _cur_time);
 
-    void addPoints();
+  void setMask();
 
-    bool updateID(unsigned int i);
+  void addPoints();
 
-    void readIntrinsicParameter(const string &calib_file);
+  bool updateID(unsigned int i);
 
-    void showUndistortion(const string &name);
+  void readIntrinsicParameter(const string &calib_file);
 
-    void rejectWithF();
+  void showUndistortion(const string &name);
 
-    void undistortedPoints();
+  void rejectWithF();
 
-    cv::Mat mask;
-    cv::Mat fisheye_mask;
-    cv::Mat prev_img, cur_img, forw_img;
-    vector<cv::Point2f> n_pts;
-    vector<cv::Point2f> prev_pts, cur_pts, forw_pts;
-    vector<cv::Point2f> prev_un_pts, cur_un_pts;
-    vector<cv::Point2f> pts_velocity;
-    vector<int> ids;
-    vector<int> track_cnt;
-    map<int, cv::Point2f> cur_un_pts_map;
-    map<int, cv::Point2f> prev_un_pts_map;
-    camodocal::CameraPtr m_camera;
-    double cur_time;
-    double prev_time;
+  void undistortedPoints();
 
-    static int n_id;
+  cv::Mat mask;
+  cv::Mat fisheye_mask;
+  cv::Mat prev_img, cur_img, forw_img;
+  vector<cv::Point2f> n_pts;
+  vector<cv::Point2f> prev_pts, cur_pts, forw_pts;
+  vector<cv::Point2f> prev_un_pts, cur_un_pts;
+  vector<cv::Point2f> pts_velocity;
+  vector<int> ids;
+  vector<int> track_cnt;
+  map<int, cv::Point2f> cur_un_pts_map;
+  map<int, cv::Point2f> prev_un_pts_map;
+  camodocal::CameraPtr m_camera;
+  double cur_time;
+  double prev_time;
+
+  static int n_id;
+
+  std::unique_ptr<FeatureTrackingAlgorithm> tracking_algorithm_;
 };

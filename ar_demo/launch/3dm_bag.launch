@@ -1,6 +1,5 @@
 <launch>
-	<include file="$(find vins_estimator)/launch/3dm.launch"/>
-
+    <include file="$(find vins_estimator)/launch/3dm.launch"/>
     <node pkg="ar_demo" type="ar_demo_node" name="ar_demo_node" output="screen">
         <remap from="~image_raw" to="/mv_25001498/image_raw"/>
         <remap from="~camera_pose" to="/vins_estimator/camera_pose"/>

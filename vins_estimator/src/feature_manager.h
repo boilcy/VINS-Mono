@@ -62,7 +62,7 @@ class FeaturePerId
     {
     }
 
-    int endFrame();
+    int endFrame() const;
 };
 
 class FeatureManager
@@ -77,8 +77,8 @@ class FeatureManager
     int getFeatureCount();
 
     bool addFeatureCheckParallax(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, double td);
-    void debugShow();
-    vector<pair<Vector3d, Vector3d>> getCorresponding(int frame_count_l, int frame_count_r);
+    void debugShow() const;
+    vector<pair<Vector3d, Vector3d>> getCorresponding(int frame_count_l, int frame_count_r) const;
 
     //void updateDepth(const VectorXd &x);
     void setDepth(const VectorXd &x);
@@ -94,7 +94,7 @@ class FeatureManager
     int last_track_num;
 
   private:
-    double compensatedParallax2(const FeaturePerId &it_per_id, int frame_count);
+    double compensatedParallax2(const FeaturePerId &it_per_id, int frame_count) const;
     const Matrix3d *Rs;
     Matrix3d ric[NUM_OF_CAM];
 };

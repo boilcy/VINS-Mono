@@ -6,7 +6,9 @@
 #include "utility/tic_toc.h"
 #include "initial/solve_5pts.h"
 #include "initial/initial_sfm.h"
-#include "initial/initial_alignment.h"
+#include "initial/initial_ligt.h"
+#include "initial/initial_vins.h"
+#include "initial/initial_drt.h"
 #include "initial/initial_ex_rotation.h"
 #include <std_msgs/Header.h>
 #include <std_msgs/Float32.h>
@@ -22,13 +24,13 @@
 #include <queue>
 #include <opencv2/core/eigen.hpp>
 
-
 class Estimator
 {
-  public:
+public:
     Estimator();
 
     void setParameter();
+    void setInitAlgo();
 
     // interface
     void processIMU(double t, const Vector3d &linear_acceleration, const Vector3d &angular_velocity);
@@ -37,9 +39,7 @@ class Estimator
 
     // internal
     void clearState();
-    bool initialStructure();
-    bool visualInitialAlign();
-    bool relativePose(Matrix3d &relative_R, Vector3d &relative_T, int &l);
+    void updateStateVector(const VectorXd &x);
     void slideWindow();
     void solveOdometry();
     void slideWindowNew();
@@ -48,7 +48,6 @@ class Estimator
     void vector2double();
     void double2vector();
     bool failureDetection();
-
 
     enum SolverFlag
     {
@@ -63,7 +62,7 @@ class Estimator
     };
 
     SolverFlag solver_flag;
-    MarginalizationFlag  marginalization_flag;
+    MarginalizationFlag marginalization_flag;
     Vector3d g;
     MatrixXd Ap[2], backup_A;
     VectorXd bp[2], backup_b;
@@ -93,7 +92,7 @@ class Estimator
     int sum_of_outlier, sum_of_back, sum_of_front, sum_of_invalid;
 
     FeatureManager f_manager;
-    MotionEstimator m_estimator;
+    // MotionEstimator m_estimator; converted to static
     InitialEXRotation initial_ex_rotation;
 
     bool first_imu;
@@ -104,7 +103,6 @@ class Estimator
     vector<Vector3d> margin_cloud;
     vector<Vector3d> key_poses;
     double initial_timestamp;
-
 
     double para_Pose[WINDOW_SIZE + 1][SIZE_POSE];
     double para_SpeedBias[WINDOW_SIZE + 1][SIZE_SPEEDBIAS];
@@ -122,7 +120,7 @@ class Estimator
     map<double, ImageFrame> all_image_frame;
     IntegrationBase *tmp_pre_integration;
 
-    //relocalization variable
+    // relocalization variable
     bool relocalization_info;
     double relo_frame_stamp;
     double relo_frame_index;
@@ -136,4 +134,6 @@ class Estimator
     Vector3d relo_relative_t;
     Quaterniond relo_relative_q;
     double relo_relative_yaw;
+
+    std::unique_ptr<Initializer> initial_ptr;
 };

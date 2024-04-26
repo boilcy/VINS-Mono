@@ -17,18 +17,15 @@ find_package(catkin REQUIRED COMPONENTS
     )
 
 find_package(OpenCV REQUIRED)
-
-# message(WARNING "OpenCV_VERSION: ${OpenCV_VERSION}")
-
+message(WARNING "OpenCV_VERSION: ${OpenCV_VERSION}")
 find_package(Ceres REQUIRED)
-
-include_directories(${catkin_INCLUDE_DIRS} ${CERES_INCLUDE_DIRS})
+find_package(Eigen3)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Eigen3)
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
+  ${CERES_INCLUDE_DIRS}
 )
 
 catkin_package()
@@ -46,9 +43,17 @@ add_executable(vins_estimator
     src/utility/visualization.cpp
     src/utility/CameraPoseVisualization.cpp
     src/initial/solve_5pts.cpp
-    src/initial/initial_aligment.cpp
+    src/initial/initial_base.cpp
+    src/initial/initial_vins.cpp
+    src/initial/initial_drt.cpp
     src/initial/initial_sfm.cpp
+    src/initial/initial_ligt.cpp
     src/initial/initial_ex_rotation.cpp
+    #src/drt_init/init_drt_loosely.cpp
+    #src/drt_init/init_drt_tightly.cpp
+    #src/drt_init/polynomial.cpp
+    #src/utility/imu/basic_types.cpp
+    #src/utility/imu/imu_preintegrated.cpp
     )
 
 

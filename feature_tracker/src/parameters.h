@@ -7,7 +7,9 @@ extern int COL;
 extern int FOCAL_LENGTH;
 const int NUM_OF_CAM = 1;
 
-
+extern std::string LETNET_PARAM;
+extern std::string LETNET_MODEL;
+extern std::string TRACKER_ALGO;
 extern std::string IMAGE_TOPIC;
 extern std::string IMU_TOPIC;
 extern std::string FISHEYE_MASK;
